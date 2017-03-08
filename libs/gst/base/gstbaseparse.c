@@ -3188,9 +3188,13 @@ gst_base_parse_chain (GstPad * pad, GstObject * parent, GstBuffer * buffer)
      * but interpolate in between */
     pts = gst_adapter_prev_pts (parse->priv->adapter, NULL);
     dts = gst_adapter_prev_dts (parse->priv->adapter, NULL);
-    if (GST_CLOCK_TIME_IS_VALID (pts) && (parse->priv->prev_pts != pts)) {
-      parse->priv->prev_pts = parse->priv->next_pts = pts;
-      updated_prev_pts = TRUE;
+    if (GST_CLOCK_TIME_IS_VALID (pts)) {
+      if (parse->priv->prev_pts != pts) {
+        parse->priv->prev_pts = pts;
+        updated_prev_pts = TRUE;
+      }
+      if (!GST_CLOCK_TIME_IS_VALID (parse->priv->next_pts))
+        parse->priv->next_pts = pts;
     }
 
     if (GST_CLOCK_TIME_IS_VALID (dts) && (parse->priv->prev_dts != dts)) {
